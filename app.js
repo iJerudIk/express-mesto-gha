@@ -16,7 +16,7 @@ app.use((req, res, next) => {
 app.use('/', userRoutes);
 app.use('/', cardRoutes);
 app.use('/', (req, res) => {
-  res.send({ message: 'Страница' });
+  res.status(404).send({ message: 'Страница' });
 });
 
 // Запуск сервера
