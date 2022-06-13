@@ -1,12 +1,8 @@
 const Card = require('../models/card');
 
 const checkErrors = (err, res) => {
-  if (err.name === 'ValidationError') {
+  if (err.name === 'ValidationError' || err.name === 'CastError') {
     res.status(400).send({ message: 'Переданы некорректные данные' });
-    return;
-  }
-  if (err.name === 'CastError') {
-    res.status(404).send({ message: 'Пользователь не найден' });
     return;
   }
   res.status(500).send({ message: 'Неизвестная ошибка' });
@@ -26,18 +22,35 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
-    .then((data) => { res.send(data); })
+    .then((data) => {
+      if (data) res.send(data);
+      else res.status(404).send({ message: 'Карточка не найден' });
+    })
     .catch((err) => { checkErrors(err, res); });
 };
 module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, {new: true, runValidators: true, upsert: true})
-    .then((data) => { res.send(data); })
+  Card.findByIdAndUpdate(
+    cardId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true, runValidators: true, upsert: true },
+  )
+    .then((data) => {
+      if (data) res.send(data);
+      else res.status(404).send({ message: 'Карточка не найден' });
+    })
     .catch((err) => { checkErrors(err, res); });
 };
 module.exports.dislikeCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, {new: true, runValidators: true, upsert: true})
-    .then((data) => { res.send(data); })
+  Card.findByIdAndUpdate(
+    cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true, runValidators: true, upsert: true },
+  )
+    .then((data) => {
+      if (data) res.send(data);
+      else res.status(404).send({ message: 'Карточка не найден' });
+    })
     .catch((err) => { checkErrors(err, res); });
 };
