@@ -31,13 +31,13 @@ module.exports.deleteCard = (req, res) => {
 };
 module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+  Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, {new: true, runValidators: true, upsert: true})
     .then((data) => { res.send(data); })
     .catch((err) => { checkErrors(err, res); });
 };
 module.exports.dislikeCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, { new: true })
+  Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, {new: true, runValidators: true, upsert: true})
     .then((data) => { res.send(data); })
     .catch((err) => { checkErrors(err, res); });
 };

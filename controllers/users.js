@@ -30,14 +30,14 @@ module.exports.createUser = (req, res) => {
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
   const userId = req.user._id;
-  User.findByIdAndUpdate(userId, { name, about })
+  User.findByIdAndUpdate(userId, { name, about }, {new: true, runValidators: true, upsert: true})
     .then((data) => { res.send(data); })
     .catch((err) => { checkErrors(err, res); });
 };
 module.exports.updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
   const userId = req.user._id;
-  User.findByIdAndUpdate(userId, { avatar })
+  User.findByIdAndUpdate(userId, { avatar }, {new: true, runValidators: true, upsert: true})
     .then((data) => { res.send(data); })
     .catch((err) => { checkErrors(err, res); });
 };
