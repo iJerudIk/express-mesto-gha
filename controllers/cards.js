@@ -21,6 +21,7 @@ module.exports.createCard = (req, res) => {
 };
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
+
   Card.findByIdAndRemove(cardId)
     .then((data) => {
       if (data) res.send(data);
@@ -36,7 +37,7 @@ module.exports.likeCard = (req, res) => {
     { new: true, runValidators: true, upsert: true },
   )
     .then((data) => {
-      if (data) res.send(data);
+      if (data.name) res.send(data);
       else res.status(404).send({ message: 'Карточка не найден' });
     })
     .catch((err) => { checkErrors(err, res); });
@@ -49,7 +50,7 @@ module.exports.dislikeCard = (req, res) => {
     { new: true, runValidators: true, upsert: true },
   )
     .then((data) => {
-      if (data) res.send(data);
+      if (data.name) res.send(data);
       else res.status(404).send({ message: 'Карточка не найден' });
     })
     .catch((err) => { checkErrors(err, res); });
