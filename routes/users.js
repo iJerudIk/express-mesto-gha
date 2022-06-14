@@ -7,10 +7,10 @@ const {
   updateUserAvatar,
 } = require('../controllers/users');
 
-router.get('/users', getUsers); // Получение пользователей
-router.get('/users/:userId', getUserById); // Получение пользователей по id
-router.post('/users', createUser); // Создание пользователя
-router.patch('/users/me', updateUser); // Обновление данных пользователя
-router.patch('/users/me/avatar', updateUserAvatar); // Обновление аватара пользователя
+router.get('/', getUsers); // Получение пользователей
+router.get('/:userId', getUserById); // Получение пользователей по id
+router.post('/', createUser); // Создание пользователя
+router.patch('/me', updateUser); // Обновление данных пользователя
+router.patch('/me/avatar', updateUserAvatar); // Обновление аватара пользователя
 
 module.exports = { userRoutes: router };

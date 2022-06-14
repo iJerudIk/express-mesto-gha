@@ -13,13 +13,11 @@ app.use((req, res, next) => {
   req.user = { _id: '62a62a93142d57b1965e78c8' };
   next();
 });
-app.use('/', userRoutes);
-app.use('/', cardRoutes);
-app.use('/', (req, res) => {
-  res.status(404).send({ message: 'Страница' });
+app.use('/users', userRoutes);
+app.use('/cards', cardRoutes);
+app.use((req, res) => {
+  res.status(404).send({ message: 'Страница не найдена' });
 });
 
 // Запуск сервера
-app.listen(3000, () => {
-  console.log('App listening on port 3000');
-});
+app.listen(3000);

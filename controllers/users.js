@@ -1,12 +1,6 @@
 const User = require('../models/user');
+const { checkErrors } = require('../utils/utils');
 
-const checkErrors = (err, res) => {
-  if (err.name === 'ValidationError' || err.name === 'CastError') {
-    res.status(400).send({ message: 'Переданы некорректные данные' });
-    return;
-  }
-  res.status(500).send({ message: 'Неизвестная ошибка' });
-};
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((data) => { res.send(data); })
@@ -23,7 +17,7 @@ module.exports.getUserById = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((data) => { res.send(data); })
+    .then((data) => { res.status(201).send(data); })
     .catch((err) => { checkErrors(err, res); });
 };
 module.exports.updateUser = (req, res) => {
@@ -32,7 +26,7 @@ module.exports.updateUser = (req, res) => {
   User.findByIdAndUpdate(
     userId,
     { name, about },
-    { new: true, runValidators: true, upsert: true },
+    { new: true, runValidators: true },
   )
     .then((data) => {
       if (data) res.send(data);
@@ -46,7 +40,7 @@ module.exports.updateUserAvatar = (req, res) => {
   User.findByIdAndUpdate(
     userId,
     { avatar },
-    { new: true, runValidators: true, upsert: true },
+    { new: true, runValidators: true },
   )
     .then((data) => {
       if (data) res.send(data);

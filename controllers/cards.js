@@ -1,12 +1,6 @@
 const Card = require('../models/card');
+const { checkErrors } = require('../utils/utils');
 
-const checkErrors = (err, res) => {
-  if (err.name === 'ValidationError' || err.name === 'CastError') {
-    res.status(400).send({ message: 'Переданы некорректные данные' });
-    return;
-  }
-  res.status(500).send({ message: 'Неизвестная ошибка' });
-};
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((data) => { res.send(data); })
@@ -16,7 +10,7 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
-    .then((data) => { res.send(data); })
+    .then((data) => { res.status(201).send(data); })
     .catch((err) => { checkErrors(err, res); });
 };
 module.exports.deleteCard = (req, res) => {
@@ -34,10 +28,10 @@ module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true, upsert: true },
+    { new: true },
   )
     .then((data) => {
-      if (data.name) res.send(data);
+      if (data) res.send(data);
       else res.status(404).send({ message: 'Карточка не найден' });
     })
     .catch((err) => { checkErrors(err, res); });
@@ -47,10 +41,10 @@ module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } },
-    { new: true, runValidators: true, upsert: true },
+    { new: true },
   )
     .then((data) => {
-      if (data.name) res.send(data);
+      if (data) res.send(data);
       else res.status(404).send({ message: 'Карточка не найден' });
     })
     .catch((err) => { checkErrors(err, res); });
