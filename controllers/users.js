@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const { checkErrors } = require('../utils/utils');
 
@@ -14,11 +16,22 @@ module.exports.getUserById = (req, res) => {
     })
     .catch((err) => { checkErrors(err, res); });
 };
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((data) => { res.status(201).send(data); })
+module.exports.getCurrentUser = (req, res) => {
+  User.findById(req.user._id)
+    .then((data) => {
+      if (data) res.send(data);
+      else res.status(404).send({ message: 'Пользователь не найден' });
+    })
     .catch((err) => { checkErrors(err, res); });
+};
+module.exports.createUser = (req, res) => {
+  const { name, about, avatar, email, password } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({ name, about, avatar, email, password: hash })
+        .then((data) => { res.status(201).send(data); })
+        .catch((err) => { checkErrors(err, res); });
+    });
 };
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
@@ -47,4 +60,15 @@ module.exports.updateUserAvatar = (req, res) => {
       else res.status(404).send({ message: 'Пользователь не найден' });
     })
     .catch((err) => { checkErrors(err, res); });
+};
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
+      res.cookie('token', token);
+      res.send({ token });
+    })
+    .catch((err) => { res.status(401).send({ message: err.message }); });
 };
