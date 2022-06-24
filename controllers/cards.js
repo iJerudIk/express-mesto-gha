@@ -15,18 +15,16 @@ module.exports.createCard = (req, res) => {
 };
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
+  const userId = req.user._id;
 
   Card.findById(cardId)
     .then((card) => {
-      if (card.owner !== req.user._id) res.status(403).send({ message: 'Эта карточка не ваша' });
-      else {
+      if (!card) res.status(404).send({ message: 'Карточка не найден' });
+      else if (String(card.owner) === userId) {
         Card.findByIdAndRemove(cardId)
-          .then((data) => {
-            if (data) res.send(data);
-            else res.status(404).send({ message: 'Карточка не найден' });
-          })
+          .then((data) => { res.send(data); })
           .catch((err) => { checkErrors(err, res); });
-      }
+      } else res.status(403).send({ message: 'Эта карточка не ваша' });
     });
 };
 module.exports.likeCard = (req, res) => {
