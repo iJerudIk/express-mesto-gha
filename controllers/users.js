@@ -25,10 +25,22 @@ module.exports.getCurrentUser = (req, res) => {
     .catch((err) => { checkErrors(err, res); });
 };
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => {
-      User.create({ name, about, avatar, email, password: hash })
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
         .then((data) => { res.status(201).send(data); })
         .catch((err) => { checkErrors(err, res); });
     });

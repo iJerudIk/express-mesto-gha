@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 
 const { cardRoutes } = require('./routes/cards');
 const { userRoutes } = require('./routes/users');
@@ -23,11 +23,21 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(limiter);
 
-app.post('/signup', createUser);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2),
+    avatar: Joi.string().pattern(/(https?:\/\/)(w{3}\.)?([\W\\\da-z-]{2,200})/),
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), createUser);
 app.post('/signin', login);
 
 app.use('/cards', auth, cardRoutes);
 app.use('/users', auth, userRoutes);
+
+app.use(errors());
 
 app.use((req, res) => {
   res.status(404).send({ message: 'Страница не найдена' });
