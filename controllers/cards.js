@@ -22,7 +22,7 @@ module.exports.deleteCard = (req, res) => {
       if (!card) res.status(404).send({ message: 'Карточка не найден' });
       else if (String(card.owner) === userId) {
         Card.findByIdAndRemove(cardId)
-          .then((data) => { res.send(data); })
+          .then(() => { res.status(200).send({ message: 'Карточка удалена' }); })
           .catch((err) => { checkErrors(err, res); });
       } else res.status(403).send({ message: 'Эта карточка не ваша' });
     });

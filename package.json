@@ -33,9 +33,9 @@
   },
   "main": "app.js",
   "keywords": [],
-  "author": "",
+  "author": "Aleksey Shinkevich",
   "license": "ISC",
-  "description": "",
+  "description": "Express-Mesto 11",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.0",
