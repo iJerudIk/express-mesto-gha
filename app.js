@@ -10,6 +10,7 @@ const { userRoutes } = require('./routes/users');
 
 const { createUser, login } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -22,6 +23,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb'); // Подключение
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(limiter);
+
+app.use(requestLogger);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -38,9 +41,10 @@ app.post('/signin', celebrate({
     password: Joi.string().required(),
   }),
 }), login);
-
 app.use('/cards', auth, cardRoutes);
 app.use('/users', auth, userRoutes);
+
+app.use(errorLogger);
 
 app.use(errors());
 
